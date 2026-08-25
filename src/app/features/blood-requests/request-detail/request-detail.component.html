@@ -1,0 +1,40 @@
+<div class="max-w-lg">
+  @if (loading()) {
+    <p class="text-gray-400">Loading...</p>
+  } @else {
+    @if (request(); as req) {
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-2xl font-bold text-red-700">{{ formatBloodType(req.bloodTypeNeeded) }}</span>
+          <span class="text-sm font-semibold px-3 py-1 rounded-full bg-red-100 text-red-700">{{ req.urgency }}</span>
+        </div>
+
+        <p class="text-gray-800 mb-4">{{ req.patientContext }}</p>
+
+        <div class="space-y-2 text-sm text-gray-500 mb-6">
+          <p><span class="font-medium text-gray-700">Units needed:</span> {{ req.unitsNeeded }}</p>
+          <p><span class="font-medium text-gray-700">Units fulfilled:</span> {{ req.unitsFulfilled }}</p>
+          <p><span class="font-medium text-gray-700">Needed by:</span> {{ req.neededByUtc | date:'medium' }}</p>
+          <p><span class="font-medium text-gray-700">Status:</span> {{ req.status }}</p>
+        </div>
+
+        @if (auth.hasRole('Donor') && !responded()) {
+          <div class="flex gap-3">
+            <button (click)="respond(true)" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg transition">
+              I can donate
+            </button>
+            <button (click)="respond(false)" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 rounded-lg transition">
+              Can't help
+            </button>
+          </div>
+        }
+
+        @if (responded()) {
+          <div class="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3">
+            Thank you — your response has been recorded.
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

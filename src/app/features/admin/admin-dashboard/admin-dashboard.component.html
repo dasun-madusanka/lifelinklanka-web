@@ -1,0 +1,36 @@
+<div>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+
+  @if (stats(); as s) {
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow p-5">
+        <p class="text-3xl font-bold text-blue-600">{{ s.totalDonors }}</p>
+        <p class="text-sm text-gray-500">Total Donors</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-5">
+        <p class="text-3xl font-bold text-purple-600">{{ s.totalHospitals }}</p>
+        <p class="text-sm text-gray-500">Verified Hospitals</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-5">
+        <p class="text-3xl font-bold text-orange-600">{{ s.openRequests }}</p>
+        <p class="text-sm text-gray-500">Open Requests</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-5">
+        <p class="text-3xl font-bold text-red-600">{{ s.criticalRequests }}</p>
+        <p class="text-sm text-gray-500">Critical Requests</p>
+      </div>
+    </div>
+  }
+
+  <div class="flex gap-4">
+    <a routerLink="/admin/users" class="bg-white rounded-xl shadow p-5 hover:shadow-lg transition flex-1">
+      <h3 class="font-semibold text-gray-800">👥 Manage Users</h3>
+    </a>
+    <a routerLink="/admin/hospitals" class="bg-white rounded-xl shadow p-5 hover:shadow-lg transition flex-1">
+      <h3 class="font-semibold text-gray-800">🏥 Verify Hospitals</h3>
+    </a>
+    <a routerLink="/admin/audit-logs" class="bg-white rounded-xl shadow p-5 hover:shadow-lg transition flex-1">
+      <h3 class="font-semibold text-gray-800">📜 Audit Logs</h3>
+    </a>
+  </div>
+</div>

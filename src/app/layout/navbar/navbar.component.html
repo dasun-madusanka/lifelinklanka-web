@@ -1,0 +1,37 @@
+<nav class="bg-red-700 text-white shadow-md">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a routerLink="/dashboard" class="text-xl font-bold flex items-center gap-2">
+      🩸 LifeLink Lanka
+    </a>
+
+    @if (auth.isLoggedIn()) {
+      <div class="flex items-center gap-4 text-sm">
+        <a routerLink="/dashboard" routerLinkActive="underline" class="hover:text-red-200">Dashboard</a>
+        <a routerLink="/blood-requests" routerLinkActive="underline" class="hover:text-red-200">Blood Requests</a>
+
+        @if (auth.hasRole('Donor')) {
+          <a routerLink="/donor/profile" routerLinkActive="underline" class="hover:text-red-200">My Profile</a>
+          <a routerLink="/donor/matches" routerLinkActive="underline" class="hover:text-red-200">My Matches</a>
+        }
+
+        @if (auth.hasRole('HospitalStaff')) {
+          <a routerLink="/blood-requests/create" routerLinkActive="underline" class="hover:text-red-200">New Request</a>
+        }
+
+        @if (auth.hasRole('Admin')) {
+          <a routerLink="/admin/dashboard" routerLinkActive="underline" class="hover:text-red-200">Admin</a>
+        }
+
+        <span class="text-red-200">{{ auth.currentUser()?.fullName }}</span>
+        <button (click)="logout()" class="bg-red-800 hover:bg-red-900 px-3 py-1.5 rounded text-white">
+          Logout
+        </button>
+      </div>
+    } @else {
+      <div class="flex gap-3">
+        <a routerLink="/login" class="hover:text-red-200">Login</a>
+        <a routerLink="/register" class="bg-white text-red-700 px-3 py-1.5 rounded font-medium">Register</a>
+      </div>
+    }
+  </div>
+</nav>

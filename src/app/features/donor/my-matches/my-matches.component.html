@@ -1,0 +1,34 @@
+<div>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">My Blood Request Matches</h1>
+
+  @if (loading()) {
+    <p class="text-gray-400">Loading...</p>
+  } @else if (matches().length === 0) {
+    <p class="text-gray-400">You haven't been matched to any requests yet.</p>
+  } @else {
+    <div class="space-y-4">
+      @for (match of matches(); track match.id) {
+        <a [routerLink]="['/blood-requests', match.bloodRequestId]"
+           class="block bg-white rounded-xl shadow p-5 hover:shadow-lg transition">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="font-semibold text-gray-800">{{ match.bloodRequest.patientContext }}</p>
+              <p class="text-sm text-gray-500 mt-1">
+                {{ formatBloodType(match.bloodRequest.bloodTypeNeeded) }} — {{ match.bloodRequest.unitsNeeded }} units needed
+              </p>
+            </div>
+            @if (match.donorResponded) {
+              @if (match.donorAccepted) {
+                <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">You accepted</span>
+              } @else {
+                <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">You declined</span>
+              }
+            } @else {
+              <span class="bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full">Awaiting response</span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

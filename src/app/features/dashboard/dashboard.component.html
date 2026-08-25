@@ -1,0 +1,56 @@
+<div>
+  <h1 class="text-2xl font-bold text-gray-800 mb-1">Welcome, {{ auth.currentUser()?.fullName }}</h1>
+  <p class="text-gray-500 mb-8">
+    {{ auth.hasRole('Admin') ? 'System Administrator' : auth.hasRole('HospitalStaff') ? 'Hospital Staff' : auth.hasRole('BloodBank') ? 'Blood Bank Operator' : 'Registered Donor' }}
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <a routerLink="/blood-requests" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-red-600">
+      <h3 class="font-semibold text-gray-800 text-lg mb-1">🩸 Open Blood Requests</h3>
+      <p class="text-sm text-gray-500">View active requests across Sri Lanka</p>
+    </a>
+
+    @if (auth.hasRole('Donor')) {
+      <a routerLink="/donor/profile" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-blue-600">
+        <h3 class="font-semibold text-gray-800 text-lg mb-1">👤 My Donor Profile</h3>
+        <p class="text-sm text-gray-500">Manage your blood type and eligibility</p>
+      </a>
+      <a routerLink="/donor/matches" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-green-600">
+        <h3 class="font-semibold text-gray-800 text-lg mb-1">✅ My Matches</h3>
+        <p class="text-sm text-gray-500">Requests you've been matched to</p>
+      </a>
+    }
+
+    @if (auth.hasRole('HospitalStaff') || auth.hasRole('Admin')) {
+      <a routerLink="/blood-requests/create" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-orange-600">
+        <h3 class="font-semibold text-gray-800 text-lg mb-1">➕ Raise Blood Request</h3>
+        <p class="text-sm text-gray-500">Broadcast an urgent or critical need</p>
+      </a>
+      <a routerLink="/hospitals/register" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-purple-600">
+        <h3 class="font-semibold text-gray-800 text-lg mb-1">🏥 Register Hospital</h3>
+        <p class="text-sm text-gray-500">Onboard a new hospital for verification</p>
+      </a>
+    }
+
+    @if (auth.hasRole('BloodBank') || auth.hasRole('Admin')) {
+      <a routerLink="/blood-banks/record-donation" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-teal-600">
+        <h3 class="font-semibold text-gray-800 text-lg mb-1">📋 Record Donation</h3>
+        <p class="text-sm text-gray-500">Log a completed blood donation</p>
+      </a>
+    }
+
+    @if (auth.hasRole('Admin')) {
+      <a routerLink="/admin/dashboard" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-gray-800">
+        <h3 class="font-semibold text-gray-800 text-lg mb-1">⚙️ Admin Console</h3>
+        <p class="text-sm text-gray-500">Manage users, hospitals, and audit logs</p>
+      </a>
+    }
+
+    <a routerLink="/documents/upload" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-yellow-600">
+      <h3 class="font-semibold text-gray-800 text-lg mb-1">📄 Upload Document</h3>
+      <p class="text-sm text-gray-500">Submit NIC, medical, or license documents</p>
+    </a>
+
+  </div>
+</div>

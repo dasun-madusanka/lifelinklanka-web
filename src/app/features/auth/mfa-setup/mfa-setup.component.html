@@ -1,0 +1,51 @@
+<div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 mt-10">
+
+  @if (verifyMode) {
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Two-Factor Verification</h2>
+    <p class="text-sm text-gray-500 mb-6">Enter the 6-digit code from your authenticator app to finish logging in.</p>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">{{ errorMessage() }}</div>
+    }
+
+    <form (ngSubmit)="onVerifySubmit()" class="space-y-4">
+      <input type="text" name="code" [(ngModel)]="code" maxlength="6" placeholder="123456" required
+             class="w-full text-center text-2xl tracking-widest border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-red-500 focus:outline-none" />
+      <button type="submit" [disabled]="loading()"
+              class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition">
+        {{ loading() ? 'Verifying...' : 'Verify & Continue' }}
+      </button>
+    </form>
+
+  } @else {
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Set Up Two-Factor Authentication</h2>
+    <p class="text-sm text-gray-500 mb-6">Scan this QR code with Google Authenticator, Microsoft Authenticator, or Authy.</p>
+
+    @if (successMessage()) {
+      <div class="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">{{ successMessage() }}</div>
+    }
+    @if (errorMessage()) {
+      <div class="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">{{ errorMessage() }}</div>
+    }
+
+    @if (qrCodeBase64()) {
+      <div class="flex justify-center mb-4">
+        <img [src]="'data:image/png;base64,' + qrCodeBase64()" alt="MFA QR Code" class="border rounded-lg" />
+      </div>
+      <p class="text-xs text-gray-400 text-center mb-6 break-all">
+        Can't scan? Enter manually: <span class="font-mono">{{ secretKey() }}</span>
+      </p>
+
+      <form (ngSubmit)="onEnableSubmit()" class="space-y-4">
+        <input type="text" name="code" [(ngModel)]="code" maxlength="6" placeholder="Enter 6-digit code" required
+               class="w-full text-center text-2xl tracking-widest border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-red-500 focus:outline-none" />
+        <button type="submit" [disabled]="loading()"
+                class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition">
+          {{ loading() ? 'Enabling...' : 'Enable MFA' }}
+        </button>
+      </form>
+    } @else {
+      <p class="text-gray-400 text-center">Loading QR code...</p>
+    }
+  }
+</div>
