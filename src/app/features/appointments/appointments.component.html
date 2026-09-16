@@ -1,0 +1,222 @@
+<div class="space-y-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-red-600 bg-red-50 px-2.5 py-0.5 rounded-full">
+          National Scheduling System
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Donation Appointments</h1>
+      <p class="text-xs sm:text-sm text-slate-500">Book dedicated donation time slots at hospital blood centers or mobile drives with pre-arrival digital clearance.</p>
+    </div>
+
+    <button (click)="openBookingModal()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md shadow-red-200 transition flex items-center gap-2 self-start sm:self-auto">
+      <span>+ Schedule New Appointment</span>
+    </button>
+  </div>
+
+  <!-- Appointments List -->
+  <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-black text-slate-900">
+        {{ auth.hasRole('BloodBank') || auth.hasRole('Admin') ? 'National Scheduled Appointments' : 'Your Scheduled Appointments' }}
+      </h2>
+      <span class="text-xs text-slate-400 font-medium">{{ appointments().length }} total</span>
+    </div>
+
+    @if (loading()) {
+      <div class="p-12 text-center text-sm text-slate-400">Loading appointments...</div>
+    } @else if (appointments().length === 0) {
+      <div class="text-center py-12 text-slate-400">
+        <span class="text-4xl block mb-2">📅</span>
+        <p class="font-bold text-slate-700 text-sm">No scheduled appointments found</p>
+        <p class="text-xs text-slate-500 mt-1 mb-4">Book a slot to skip queues at the blood bank.</p>
+        <button (click)="openBookingModal()" class="bg-slate-900 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+          Book Appointment Now
+        </button>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (a of appointments(); track a.id) {
+          <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-black text-slate-900 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">
+                  📅 {{ a.scheduledSlotUtc | date:'medium' }}
+                </span>
+                <span [ngClass]="a.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : (a.status === 'Cancelled' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700')"
+                      class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">
+                  {{ a.status }}
+                </span>
+              </div>
+
+              <h3 class="font-bold text-slate-900 text-base mt-2">
+                {{ a.bloodBankName ?? a.bloodCampTitle ?? 'Central Blood Center' }}
+              </h3>
+              <p class="text-xs text-slate-600 mt-1">
+                Donor: <strong>{{ a.donorName }}</strong> ({{ a.bloodType }})
+                @if (a.donorPhone && a.donorPhone !== 'N/A') {
+                  · 📞 {{ a.donorPhone }}
+                }
+              </p>
+              @if (a.notes) {
+                <p class="text-xs text-slate-600 italic mt-2 bg-white p-2 rounded-lg border border-slate-100">"{{ a.notes }}"</p>
+              }
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-200 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-emerald-700 font-bold flex items-center gap-1">
+                  <span>✓</span> Pre-Screening Cleared
+                </span>
+
+                @if (a.status !== 'Cancelled' && a.status !== 'Completed') {
+                  <button (click)="cancelAppointment(a.id)" class="text-rose-600 hover:text-rose-800 font-bold text-xs">
+                    Cancel Slot
+                  </button>
+                }
+              </div>
+
+              <!-- BloodBank / Admin Management Actions -->
+              @if (auth.hasRole('BloodBank') || auth.hasRole('Admin')) {
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px] text-slate-400 font-bold">Mark:</span>
+                    <button (click)="updateStatus(a.id, 'Completed')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded">
+                      ✓ Done
+                    </button>
+                    <button (click)="updateStatus(a.id, 'Missed')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1 rounded">
+                      Missed
+                    </button>
+                    <button (click)="updateStatus(a.id, 'Cancelled')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1 rounded">
+                      Cancel
+                    </button>
+                  </div>
+                  <button (click)="deleteAppointment(a.id)" class="text-rose-600 hover:text-rose-800 text-[11px] font-bold" title="Delete appointment record">
+                    🗑️ Delete
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- BOOKING & PRE-SCREENING MODAL -->
+@if (showBookingModal()) {
+  <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-6 sm:p-8 border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-black text-slate-900">Schedule Donation Appointment</h3>
+        <button (click)="closeBookingModal()" class="text-slate-400 hover:text-slate-700 text-lg">✕</button>
+      </div>
+
+      @if (bookingSuccess()) {
+        <div class="bg-emerald-50 text-emerald-800 p-6 rounded-2xl text-center text-sm font-bold border border-emerald-200">
+          <span class="text-4xl block mb-2">🎉</span>
+          Appointment confirmed! Your appointment pass has been booked and pre-screening passed.
+        </div>
+      } @else {
+        <form (ngSubmit)="submitBooking()" class="space-y-5 text-xs">
+
+          <!-- Location Selector: Bank vs Camp -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-2">Donation Destination</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" (click)="bookingMode.set('bank')"
+                      [ngClass]="bookingMode() === 'bank' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700'"
+                      class="py-2.5 rounded-xl font-bold transition">
+                Hospital Blood Center
+              </button>
+              <button type="button" (click)="bookingMode.set('camp')"
+                      [ngClass]="bookingMode() === 'camp' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700'"
+                      class="py-2.5 rounded-xl font-bold transition">
+                Mobile Blood Drive
+              </button>
+            </div>
+          </div>
+
+          @if (bookingMode() === 'bank') {
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Select Blood Center</label>
+              <select [(ngModel)]="selectedBankId" name="selectedBankId" required
+                      class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-red-500">
+                @for (b of bloodBanks(); track b.id) {
+                  <option [value]="b.id">{{ b.name }} ({{ b.district }})</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Select Mobile Drive</label>
+              <select [(ngModel)]="selectedCampId" name="selectedCampId" required
+                      class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-red-500">
+                @for (c of camps(); track c.id) {
+                  <option [value]="c.id">{{ c.title }} ({{ c.district }})</option>
+                }
+              </select>
+            </div>
+          }
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Preferred Time Slot</label>
+            <input type="datetime-local" [(ngModel)]="scheduledSlot" name="scheduledSlot" required
+                   class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-red-500" />
+          </div>
+
+          <!-- Digital Pre-Screening Verification Checklist -->
+          <div class="pt-4 border-t border-slate-200">
+            <h4 class="font-black text-slate-900 text-sm mb-1">Clinical Digital Pre-Screening Clearance</h4>
+            <p class="text-slate-500 text-[11px] mb-3">Confirm your eligibility before confirming the booking slot.</p>
+
+            <div class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+              @for (q of questions(); track q.id) {
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3">
+                  <div class="flex-1">
+                    <p class="font-bold text-slate-800 text-[11px]">{{ q.question }}</p>
+                    <p class="text-[9px] text-slate-400">{{ q.hint }}</p>
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] font-bold">
+                    <label class="flex items-center gap-1 cursor-pointer">
+                      <input type="radio" [name]="'q_' + q.id" [value]="true" [(ngModel)]="answers[q.id]" /> Yes
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                      <input type="radio" [name]="'q_' + q.id" [value]="false" [(ngModel)]="answers[q.id]" /> No
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (screeningFailed()) {
+              <div class="bg-red-50 text-red-700 p-3 rounded-xl mt-3 font-bold text-xs border border-red-200">
+                ⚠️ Your pre-screening responses indicate a temporary deferral condition. Please review your answers or consult a medical officer at the blood center.
+              </div>
+            }
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Special Notes / Dietary Requirements (Optional)</label>
+            <input type="text" [(ngModel)]="donorNotes" name="donorNotes"
+                   class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-red-500" placeholder="e.g. First time donor, vegetarian" />
+          </div>
+
+          <div class="pt-2 flex gap-3">
+            <button type="button" (click)="closeBookingModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl transition">
+              Cancel
+            </button>
+            <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition shadow">
+              Confirm Appointment
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+}

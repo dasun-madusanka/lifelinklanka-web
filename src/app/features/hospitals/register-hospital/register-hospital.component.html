@@ -1,43 +1,142 @@
-<div class="max-w-lg">
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Register a Hospital</h1>
+<div class="space-y-8 max-w-5xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <span class="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+        Clinical Trauma Centers & Blood Banks
+      </span>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Hospital Management & Registration</h1>
+      <p class="text-xs sm:text-sm text-slate-500">Register new hospital trauma centers and manage institutional affiliations across Sri Lanka.</p>
+    </div>
+  </div>
 
   @if (successMessage()) {
-    <div class="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">{{ successMessage() }}</div>
+    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-2xl p-4 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">✅</span>
+        <span class="font-bold">{{ successMessage() }}</span>
+      </div>
+      <button (click)="successMessage.set(null)" class="text-emerald-700 font-bold hover:text-emerald-900 text-xs">✕</button>
+    </div>
   }
+
   @if (errorMessage()) {
-    <div class="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">{{ errorMessage() }}</div>
+    <div class="bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl p-4 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">⚠️</span>
+        <span class="font-bold">{{ errorMessage() }}</span>
+      </div>
+      <button (click)="errorMessage.set(null)" class="text-red-700 font-bold hover:text-red-900 text-xs">✕</button>
+    </div>
   }
 
-  <form (ngSubmit)="onSubmit()" class="bg-white rounded-xl shadow p-6 space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Hospital Name</label>
-      <input type="text" name="name" [(ngModel)]="name" required
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Ministry of Health Registration Number</label>
-      <input type="text" name="registrationNumber" [(ngModel)]="registrationNumber" required
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">District</label>
-      <input type="text" name="district" [(ngModel)]="district" required
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-      <textarea name="address" [(ngModel)]="address" rows="2" required
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"></textarea>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Contact Phone</label>
-      <input type="text" name="contactPhone" [(ngModel)]="contactPhone" required placeholder="0112691111"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <!-- LEFT: Registration Form (5 cols) -->
+    <div class="lg:col-span-5 bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xl">🏥</span>
+        <h2 class="text-base font-bold text-slate-900">Register New Hospital</h2>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Hospital Name *</label>
+          <input type="text" name="name" [(ngModel)]="name" required placeholder="e.g. Colombo South Teaching Hospital"
+                 class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">MOH Registration Number *</label>
+          <input type="text" name="registrationNumber" [(ngModel)]="registrationNumber" required placeholder="e.g. MOH-COL-008"
+                 class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+          <p class="text-[10px] text-slate-400 mt-1">Ministry of Health registration / accreditation code</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">District *</label>
+          <select name="district" [(ngModel)]="district" required
+                  class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            @for (d of districts; track d) {
+              <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Physical Address *</label>
+          <textarea name="address" [(ngModel)]="address" rows="2" required placeholder="e.g. Kalubowila, Dehiwala, Western Province"
+                    class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Direct Contact Phone *</label>
+          <input type="text" name="contactPhone" [(ngModel)]="contactPhone" required placeholder="+94 11 276 3066"
+                 class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+        </div>
+
+        <button type="submit" [disabled]="loading()"
+                class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl text-xs shadow-md shadow-blue-200 transition flex items-center justify-center gap-2">
+          @if (loading()) {
+            <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span>Registering Hospital...</span>
+          } @else {
+            <span>Submit Hospital Registration →</span>
+          }
+        </button>
+      </form>
     </div>
 
-    <button type="submit" [disabled]="loading()"
-            class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition">
-      {{ loading() ? 'Submitting...' : 'Submit for Verification' }}
-    </button>
-  </form>
+    <!-- RIGHT: Existing Registered Hospitals Directory (7 cols) -->
+    <div class="lg:col-span-7 bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Registered Hospitals Directory</h2>
+          <p class="text-xs text-slate-500">Live clinical trauma facilities in the national database.</p>
+        </div>
+        <span class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
+          {{ hospitals().length }} Facilities
+        </span>
+      </div>
+
+      @if (fetching()) {
+        <div class="p-10 text-center text-xs text-slate-400">Loading hospitals directory...</div>
+      } @else if (hospitals().length === 0) {
+        <div class="p-10 text-center border-2 border-dashed border-slate-200 rounded-2xl">
+          <span class="text-3xl mb-2 block">🏥</span>
+          <p class="text-xs font-bold text-slate-700">No Hospitals Registered Yet</p>
+          <p class="text-[11px] text-slate-400 mt-1">Use the form on the left to register the first hospital trauma center.</p>
+        </div>
+      } @else {
+        <div class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+          @for (h of hospitals(); track h.id) {
+            <div class="p-4 rounded-2xl border border-slate-200 hover:border-slate-300 transition bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-bold text-xs text-slate-900">{{ h.name }}</span>
+                  <span class="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                    {{ h.district }}
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500">{{ h.address }}</p>
+                <div class="flex items-center gap-3 mt-1.5 text-[11px] text-slate-600">
+                  <span>Reg: <strong class="font-mono text-slate-700">{{ h.registrationNumber }}</strong></span>
+                  <span>📞 {{ h.contactPhone }}</span>
+                </div>
+              </div>
+
+              @if (auth.hasRole('HospitalStaff') || auth.hasRole('Admin')) {
+                <button (click)="onDelete(h.id, h.name)"
+                        class="text-xs font-bold text-red-600 hover:text-red-800 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition self-end sm:self-center">
+                  ✕ Remove
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
 </div>

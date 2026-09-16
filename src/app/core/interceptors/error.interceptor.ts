@@ -10,12 +10,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !req.url.includes('/auth/login')) {
-        // Access token expired/invalid and this wasn't a login attempt itself —
-        // simplest safe behavior for a portfolio project: force re-login.
-        // (A production app would attempt a silent refresh here first.)
-        tokenStorage.clear();
-        router.navigate(['/login']);
+      if (error.status === 401 && !req.url.includes('/auth/')) {
+        if (tokenStorage.getAccessToken()) {
+          tokenStorage.clear();
+          router.navigate(['/login']);
+        }
       }
       return throwError(() => error);
     })

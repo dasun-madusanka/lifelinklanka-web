@@ -7,8 +7,8 @@ import { SignalrService } from './core/services/signalr.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ShellComponent],
-  template: `<app-shell><router-outlet /></app-shell>`
+  imports: [ShellComponent],
+  template: `<app-shell />`
 })
 export class AppComponent implements OnInit {
   constructor(private auth: AuthService, private signalr: SignalrService) {}

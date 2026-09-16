@@ -1,56 +1,232 @@
-<div>
-  <h1 class="text-2xl font-bold text-gray-800 mb-1">Welcome, {{ auth.currentUser()?.fullName }}</h1>
-  <p class="text-gray-500 mb-8">
-    {{ auth.hasRole('Admin') ? 'System Administrator' : auth.hasRole('HospitalStaff') ? 'Hospital Staff' : auth.hasRole('BloodBank') ? 'Blood Bank Operator' : 'Registered Donor' }}
-  </p>
+<div class="space-y-8">
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <!-- Welcome Banner -->
+  <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div>
+      <span class="text-xs font-bold uppercase tracking-widest text-red-400 bg-red-950/80 px-2.5 py-1 rounded-full border border-red-800">
+        {{ userRoleDisplayName }}
+      </span>
+      <h1 class="text-2xl sm:text-3xl font-black text-white mt-2">
+        Welcome back, {{ auth.currentUser()?.fullName ?? 'Healthcare Officer' }}
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+        Connected to the National Blood Transfusion Service grid. Monitor shortages, dispatch units, and view community drives.
+      </p>
+    </div>
 
-    <a routerLink="/blood-requests" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-red-600">
-      <h3 class="font-semibold text-gray-800 text-lg mb-1">🩸 Open Blood Requests</h3>
-      <p class="text-sm text-gray-500">View active requests across Sri Lanka</p>
-    </a>
-
-    @if (auth.hasRole('Donor')) {
-      <a routerLink="/donor/profile" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-blue-600">
-        <h3 class="font-semibold text-gray-800 text-lg mb-1">👤 My Donor Profile</h3>
-        <p class="text-sm text-gray-500">Manage your blood type and eligibility</p>
-      </a>
-      <a routerLink="/donor/matches" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-green-600">
-        <h3 class="font-semibold text-gray-800 text-lg mb-1">✅ My Matches</h3>
-        <p class="text-sm text-gray-500">Requests you've been matched to</p>
-      </a>
-    }
-
-    @if (auth.hasRole('HospitalStaff') || auth.hasRole('Admin')) {
-      <a routerLink="/blood-requests/create" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-orange-600">
-        <h3 class="font-semibold text-gray-800 text-lg mb-1">➕ Raise Blood Request</h3>
-        <p class="text-sm text-gray-500">Broadcast an urgent or critical need</p>
-      </a>
-      <a routerLink="/hospitals/register" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-purple-600">
-        <h3 class="font-semibold text-gray-800 text-lg mb-1">🏥 Register Hospital</h3>
-        <p class="text-sm text-gray-500">Onboard a new hospital for verification</p>
-      </a>
-    }
-
-    @if (auth.hasRole('BloodBank') || auth.hasRole('Admin')) {
-      <a routerLink="/blood-banks/record-donation" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-teal-600">
-        <h3 class="font-semibold text-gray-800 text-lg mb-1">📋 Record Donation</h3>
-        <p class="text-sm text-gray-500">Log a completed blood donation</p>
-      </a>
-    }
-
-    @if (auth.hasRole('Admin')) {
-      <a routerLink="/admin/dashboard" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-gray-800">
-        <h3 class="font-semibold text-gray-800 text-lg mb-1">⚙️ Admin Console</h3>
-        <p class="text-sm text-gray-500">Manage users, hospitals, and audit logs</p>
-      </a>
-    }
-
-    <a routerLink="/documents/upload" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition border-l-4 border-yellow-600">
-      <h3 class="font-semibold text-gray-800 text-lg mb-1">📄 Upload Document</h3>
-      <p class="text-sm text-gray-500">Submit NIC, medical, or license documents</p>
-    </a>
-
+    <!-- Quick Action -->
+    <div class="flex flex-wrap gap-2">
+      @if (auth.hasRole('Donor')) {
+        <a routerLink="/donor/card" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
+          <span>🪪 Smart Donor Card</span>
+        </a>
+        <a routerLink="/appointments" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-xs backdrop-blur border border-white/20 transition">
+          Book Appointment
+        </a>
+      }
+      @if (auth.hasRole('HospitalStaff') || auth.hasRole('Admin')) {
+        <a routerLink="/blood-requests/create" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
+          <span>🚨 Raise Emergency Request</span>
+        </a>
+      }
+      @if (auth.hasRole('BloodBank') || auth.hasRole('Admin')) {
+        <a routerLink="/inventory" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
+          <span>📦 Manage Cold Chain Stock</span>
+        </a>
+      }
+    </div>
   </div>
+
+  <!-- Live KPI Metrics Strip -->
+  @if (stats(); as s) {
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Available Stock</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-black text-slate-900">{{ s.totalUnitsAvailable }} <span class="text-sm font-normal text-slate-400">units</span></p>
+        <p class="text-xs text-slate-500 mt-1">Across 25 national blood banks</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Emergency Requests</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-black text-red-600">{{ s.criticalRequestsCount }} <span class="text-sm font-normal text-slate-400">critical</span></p>
+        <p class="text-xs text-slate-500 mt-1">Requiring immediate response</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estimated Impact</span>
+          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">3x Multiplier</span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-black text-emerald-600">{{ s.estimatedLivesSaved }}+</p>
+        <p class="text-xs text-slate-500 mt-1">Lives saved in Sri Lanka</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Campaigns</span>
+          <span class="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">Community</span>
+        </div>
+        <p class="text-2xl sm:text-3xl font-black text-sky-600">{{ s.activeCamps }}</p>
+        <p class="text-xs text-slate-500 mt-1">Upcoming mobile blood drives</p>
+      </div>
+    </div>
+  }
+
+  <!-- ROLE-TAILORED QUICK ACTION PORTALS -->
+  <div class="space-y-4">
+    <h2 class="text-lg font-black text-slate-900">Operational Command Center</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <!-- Universal Links -->
+      <a routerLink="/blood-requests" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+        <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+          🩸
+        </div>
+        <h3 class="font-bold text-slate-900 text-base mb-1">Open Blood Requests</h3>
+        <p class="text-xs text-slate-500">Monitor active requests, urgency levels, and donor dispatch statuses nationwide.</p>
+      </a>
+
+      <a routerLink="/inventory" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+          📦
+        </div>
+        <h3 class="font-bold text-slate-900 text-base mb-1">Cold Chain Inventory</h3>
+        <p class="text-xs text-slate-500">Explore real-time blood storage across blood banks, PRBC units, platelets, and plasma.</p>
+      </a>
+
+      <a routerLink="/camps" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+          ⛺
+        </div>
+        <h3 class="font-bold text-slate-900 text-base mb-1">Mobile Donation Camps</h3>
+        <p class="text-xs text-slate-500">Find upcoming voluntary blood drives organized by Lions, Rotaract, and community clubs.</p>
+      </a>
+
+      <!-- Donor Portals -->
+      @if (auth.hasRole('Donor')) {
+        <a routerLink="/donor/card" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group border-l-4 border-l-red-600">
+          <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            🪪
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Digital Smart Donor Card</h3>
+          <p class="text-xs text-slate-500">Access your official encrypted digital ID, QR verification, and certificate of appreciation.</p>
+        </a>
+
+        <a routerLink="/donor/matches" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            🎯
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">My Compatible Matches</h3>
+          <p class="text-xs text-slate-500">View emergency hospital requests that match your blood type and district.</p>
+        </a>
+
+        <a routerLink="/appointments" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            📅
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Donation Appointments</h3>
+          <p class="text-xs text-slate-500">Book dedicated donation slots and complete pre-arrival health questionnaires.</p>
+        </a>
+      }
+
+      <!-- Hospital Staff Portals -->
+      @if (auth.hasRole('HospitalStaff') || auth.hasRole('Admin')) {
+        <a routerLink="/blood-requests/create" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group border-l-4 border-l-red-600">
+          <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            ➕
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Broadcast Emergency Request</h3>
+          <p class="text-xs text-slate-500">Trigger immediate SignalR alert to compatible voluntary donors and regional centers.</p>
+        </a>
+
+        <a routerLink="/hospitals/register" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            🏥
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Register Hospital Facility</h3>
+          <p class="text-xs text-slate-500">Onboard new hospital branches with Ministry of Health accreditation.</p>
+        </a>
+      }
+
+      <!-- Blood Bank Portals -->
+      @if (auth.hasRole('BloodBank') || auth.hasRole('Admin')) {
+        <a routerLink="/blood-banks/record-donation" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group border-l-4 border-l-emerald-600">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            📋
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Record Blood Donation</h3>
+          <p class="text-xs text-slate-500">Log completed donor donations, volume, and initiate the 120-day cooldown timer.</p>
+        </a>
+      }
+
+      <!-- Admin Portals -->
+      @if (auth.hasRole('Admin')) {
+        <a routerLink="/admin" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group border-l-4 border-l-slate-900">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+            👑
+          </div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Admin Command Center</h3>
+          <p class="text-xs text-slate-500">Review users, verify hospital registrations, inspect audit logs, and view executive analytics.</p>
+        </a>
+      }
+
+      <a routerLink="/map" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-red-300 transition group">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+          🗺️
+        </div>
+        <h3 class="font-bold text-slate-900 text-base mb-1">Sri Lanka 25 District Map</h3>
+        <p class="text-xs text-slate-500">View regional demand patterns, partner hospitals, and cold chain stock across the 9 provinces.</p>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- RECENT URGENT REQUESTS SECTION -->
+  <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-black text-slate-900">Live Hospital Shortages Requiring Donors</h3>
+      <a routerLink="/blood-requests" class="text-xs font-bold text-red-600 hover:underline">View All →</a>
+    </div>
+
+    @if (recentRequests().length === 0) {
+      <div class="text-center py-8 text-xs text-slate-400">
+        No active emergency requests right now. All hospital reserves are currently in safe thresholds.
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @for (req of recentRequests(); track req.id) {
+          <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-base font-black text-red-700 bg-white px-2.5 py-0.5 rounded-lg border border-red-200 shadow-sm">
+                  {{ formatBloodType(req.bloodTypeNeeded) }}
+                </span>
+                <span [ngClass]="req.urgency === 'Critical' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'"
+                      class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full">
+                  {{ req.urgency }}
+                </span>
+              </div>
+              <p class="font-bold text-slate-800 text-xs">{{ req.hospitalName ?? 'Teaching Hospital' }}</p>
+              <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">{{ req.patientContext }}</p>
+            </div>
+
+            <div class="pt-3 mt-3 border-t border-slate-200 flex items-center justify-between text-[11px]">
+              <span class="text-slate-500">Needed: <strong>{{ req.unitsNeeded - req.unitsFulfilled }} units</strong></span>
+              <a [routerLink]="['/blood-requests', req.id]" class="font-bold text-red-600 hover:underline">
+                Details →
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
 </div>

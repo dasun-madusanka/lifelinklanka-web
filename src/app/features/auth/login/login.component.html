@@ -1,32 +1,123 @@
-<div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 mt-10">
-  <h2 class="text-2xl font-bold text-gray-800 mb-6">Log in to LifeLink Lanka</h2>
+<div class="w-full flex items-center justify-center p-2 sm:p-4 my-auto">
+  <div class="max-w-4xl w-full max-h-[calc(100vh-5.5rem)] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
 
-  @if (errorMessage()) {
-    <div class="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-      {{ errorMessage() }}
+    <!-- Left Brand / Security HUD Panel (5 cols) -->
+    <div class="lg:col-span-5 bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 p-6 sm:p-7 text-white flex flex-col justify-between relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#f43f5e_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+      <div class="relative z-10 space-y-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center text-lg shadow-lg shadow-red-900/50">
+            🩸
+          </div>
+          <div>
+            <h2 class="text-lg font-black tracking-tight text-white leading-none">LifeLink<span class="text-red-500">Lanka</span></h2>
+            <p class="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5">Precision Blood Grid</p>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <span class="text-[9px] font-bold uppercase tracking-widest text-red-400 bg-red-950/80 px-2 py-0.5 rounded-full border border-red-800">
+            Verified Clinical Network
+          </span>
+          <h3 class="text-lg sm:text-xl font-black text-white mt-2 leading-snug">
+            National Transfusion & Donor Logistics
+          </h3>
+          <p class="text-[11px] text-slate-300 mt-1.5 leading-relaxed">
+            Coordinating safe voluntary donations, verified cold-chain stocks, and trauma dispatches across all 25 districts.
+          </p>
+        </div>
+      </div>
+
+      <div class="relative z-10 pt-4 border-t border-slate-800/80 space-y-1.5 text-[11px] text-slate-400">
+        <p class="flex items-center gap-2">
+          <span class="text-red-400 font-bold">✓</span> 256-Bit Encrypted Clinical Auth
+        </p>
+        <p class="flex items-center gap-2">
+          <span class="text-red-400 font-bold">✓</span> Real-Time SignalR Trauma Broadcast
+        </p>
+        <p class="flex items-center gap-2">
+          <span class="text-red-400 font-bold">✓</span> Mandatory Medical Credential Gating
+        </p>
+      </div>
     </div>
-  }
 
-  <form (ngSubmit)="onSubmit()" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-      <input type="email" name="email" [(ngModel)]="email" required
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
+    <!-- Right Login Form Panel (7 cols) -->
+    <div class="lg:col-span-7 p-6 sm:p-7 flex flex-col justify-between overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 leading-tight">Sign In</h2>
+            <p class="text-[11px] text-slate-500 mt-0.5">Enter your registered credentials to access your portal.</p>
+          </div>
+          <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg border border-red-100">
+            Secure Portal
+          </span>
+        </div>
+
+        <!-- Pending Approval Notice -->
+        @if (errorMessage() && errorMessage()!.includes('Pending')) {
+          <div class="bg-amber-50 border border-amber-300 text-amber-900 text-xs rounded-xl p-3 mb-3.5 flex items-start gap-2.5 shadow-xs animate-in fade-in">
+            <span class="text-xl leading-none">⏳</span>
+            <div class="space-y-0.5">
+              <p class="font-black text-amber-900 text-[11px]">Application Under Administrative Review</p>
+              <p class="text-amber-800 text-[11px] leading-relaxed">{{ errorMessage() }}</p>
+              <p class="text-[10px] text-amber-700">Uploaded medical certificate / facility credentials are being verified by System Administrator. Access unlocks once approved.</p>
+            </div>
+          </div>
+        } @else if (errorMessage()) {
+          <!-- Standard Error Banner -->
+          <div class="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-2.5 mb-3.5 flex items-start gap-2 animate-in fade-in">
+            <span class="text-sm leading-none">⚠️</span>
+            <span class="text-[11px]">{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <!-- Credentials Form -->
+        <form (ngSubmit)="onSubmit()" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Address</label>
+            <input type="email" name="email" [(ngModel)]="email" required placeholder="name@domain.lk"
+                   class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-red-500 focus:outline-none transition" />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-bold text-slate-700">Password</label>
+            </div>
+            <input type="password" name="password" [(ngModel)]="password" required placeholder="••••••••••••"
+                   class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-red-500 focus:outline-none transition" />
+          </div>
+
+          <button type="submit" [disabled]="loading()"
+                  class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-red-200 transition flex items-center justify-center gap-2 mt-1">
+            @if (loading()) {
+              <span class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span>Authenticating...</span>
+            } @else {
+              <span>Sign In to LifeLink Lanka →</span>
+            }
+          </button>
+        </form>
+
+        <!-- System Admin Info Note -->
+        <div class="mt-3.5 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-[10px] text-slate-500">
+          <p class="font-bold text-slate-700 flex items-center gap-1.5 mb-0.5">
+            <span>🛡️</span> System Administrator Access
+          </p>
+          <p>Initial system oversight account: <code class="text-slate-800 font-bold bg-white px-1 py-0.5 rounded border border-slate-200">admin&#64;lifelinklanka.lk</code> (Password: <code class="text-slate-800 font-bold bg-white px-1 py-0.5 rounded border border-slate-200">Admin&#64;12345!</code>).</p>
+        </div>
+      </div>
+
+      <!-- Registration CTA -->
+      <div class="pt-3 border-t border-slate-100 text-center mt-3">
+        <p class="text-[11px] text-slate-500 mb-1">Don't have an account yet?</p>
+        <a routerLink="/register"
+           class="inline-block text-[11px] font-bold text-red-600 hover:text-red-700 hover:underline">
+          Register as Voluntary Donor, Hospital Staff, or Blood Bank →
+        </a>
+      </div>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-      <input type="password" name="password" [(ngModel)]="password" required
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
-    </div>
-
-    <button type="submit" [disabled]="loading()"
-            class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition">
-      {{ loading() ? 'Logging in...' : 'Log In' }}
-    </button>
-  </form>
-
-  <p class="text-sm text-gray-500 mt-4 text-center">
-    Don't have an account? <a routerLink="/register" class="text-red-600 font-medium hover:underline">Register as a donor</a>
-  </p>
+  </div>
 </div>

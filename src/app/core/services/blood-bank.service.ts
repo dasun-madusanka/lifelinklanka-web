@@ -23,4 +23,20 @@ export class BloodBankService {
     const url = `${this.base}/${bankId}/record-donation?donorUserId=${donorUserId}&volumeMl=${volumeMl}`;
     return this.http.post(url, {});
   }
+
+  findDonor(query: string) {
+    return this.http.get<any>(`${this.base}/find-donor?query=${encodeURIComponent(query)}`);
+  }
+
+  update(id: string, dto: CreateBloodBankDto) {
+    return this.http.put<BloodBank>(`${this.base}/${id}`, dto);
+  }
+
+  delete(id: string) {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
+  deleteDonation(id: string) {
+    return this.http.delete<void>(`${this.base}/donations/${id}`);
+  }
 }

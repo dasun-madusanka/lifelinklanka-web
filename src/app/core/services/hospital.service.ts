@@ -22,4 +22,12 @@ export class HospitalService {
     if (district) url += `?district=${encodeURIComponent(district)}`;
     return this.http.get<Hospital[]>(url);
   }
+
+  update(id: string, dto: CreateHospitalDto) {
+    return this.http.put<Hospital>(`${this.base}/${id}`, dto);
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${this.base}/${id}`);
+  }
 }

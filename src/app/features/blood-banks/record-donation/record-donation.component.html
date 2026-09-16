@@ -1,51 +1,99 @@
-<div class="max-w-lg">
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Record a Blood Donation</h1>
+<div class="max-w-2xl mx-auto space-y-6">
+  <div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-bold uppercase tracking-widest text-red-600 bg-red-50 px-2.5 py-0.5 rounded-full">
+        Clinical Intake Portal
+      </span>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Record Blood Donation</h1>
+    <p class="text-xs sm:text-sm text-slate-500">Search registered donors by NIC or Email to verify eligibility and record whole blood or component collection.</p>
+  </div>
 
   @if (bloodBanks().length === 0) {
-    <div class="bg-yellow-50 text-yellow-700 text-sm rounded-lg px-4 py-3 mb-4">
-      No verified blood banks available yet — this feature requires an admin verification step for blood banks that isn't wired up on the backend yet.
+    <div class="bg-amber-50 text-amber-800 text-xs rounded-2xl p-4 border border-amber-200">
+      ⚠️ No blood bank facilities registered yet. Please ensure a Blood Bank account is registered.
     </div>
   }
 
   @if (successMessage()) {
-    <div class="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">{{ successMessage() }}</div>
+    <div class="bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl p-4 border border-emerald-200">
+      ✓ {{ successMessage() }}
+    </div>
   }
   @if (errorMessage()) {
-    <div class="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">{{ errorMessage() }}</div>
+    <div class="bg-rose-50 text-rose-800 text-xs font-bold rounded-2xl p-4 border border-rose-200">
+      ✕ {{ errorMessage() }}
+    </div>
   }
 
-  <form (ngSubmit)="onSubmit()" class="bg-white rounded-xl shadow p-6 space-y-4">
+  <!-- Step 1: Donor Verification -->
+  <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+    <h2 class="text-base font-black text-slate-900">Step 1: Donor Identification & Screening</h2>
+    <div class="flex gap-2">
+      <input type="text" [(ngModel)]="donorSearchQuery" (keyup.enter)="searchDonor()"
+             placeholder="Enter Donor National ID (NIC) or Email..."
+             class="flex-1 border border-slate-300 rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none" />
+      <button (click)="searchDonor()" [disabled]="searchingDonor()"
+              class="bg-slate-900 hover:bg-red-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition disabled:opacity-50">
+        {{ searchingDonor() ? 'Searching...' : 'Search Donor' }}
+      </button>
+    </div>
+
+    @if (searchError()) {
+      <p class="text-xs text-rose-600 font-medium">{{ searchError() }}</p>
+    }
+
+    @if (foundDonor()) {
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-black text-slate-900 text-sm">{{ foundDonor().fullName }}</span>
+          <span class="font-black text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full text-xs">
+            {{ formatBloodType(foundDonor().bloodType) }}
+          </span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-slate-600 text-[11px]">
+          <p>NIC: <strong class="text-slate-800">{{ foundDonor().nicNumber }}</strong></p>
+          <p>Email: <strong class="text-slate-800">{{ foundDonor().email }}</strong></p>
+          <p>Phone: <strong class="text-slate-800">{{ foundDonor().phoneNumber ?? 'N/A' }}</strong></p>
+          <p>District: <strong class="text-slate-800">{{ foundDonor().district }}</strong></p>
+          <p>Card #: <strong class="text-slate-800">{{ foundDonor().donorCardNumber }}</strong></p>
+          <p>Past Donations: <strong class="text-slate-800">{{ foundDonor().donationsCompletedCount }}</strong></p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+          <span class="text-[11px] font-bold" [ngClass]="foundDonor().isEligibleToDonate ? 'text-emerald-700' : 'text-amber-700'">
+            {{ foundDonor().isEligibleToDonate ? '✓ Eligible to Donate' : '⏳ In 120-Day Cooldown (Officer override permissible if authorized)' }}
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Step 2: Intake Details & Recording -->
+  <form (ngSubmit)="onSubmit()" class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+    <h2 class="text-base font-black text-slate-900">Step 2: Collection Record</h2>
+
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Blood Bank</label>
+      <label class="block text-xs font-bold text-slate-700 mb-1">Blood Center / Bank Facility</label>
       <select name="bloodBankId" [(ngModel)]="bloodBankId" required
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none">
+              class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none">
         <option value="" disabled selected>Select blood bank</option>
         @for (b of bloodBanks(); track b.id) {
-          <option [value]="b.id">{{ b.name }}</option>
+          <option [value]="b.id">{{ b.name }} ({{ b.district }})</option>
         }
       </select>
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Donor</label>
-      <select name="donorUserId" [(ngModel)]="donorUserId" required
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none">
-        <option value="" disabled selected>Select donor</option>
-        @for (u of users(); track u.id) {
-          <option [value]="u.id">{{ u.fullName }} ({{ u.email }})</option>
-        }
-      </select>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Volume (mL)</label>
+      <label class="block text-xs font-bold text-slate-700 mb-1">Collection Volume (mL)</label>
       <input type="number" name="volumeMl" [(ngModel)]="volumeMl" min="100" max="500" required
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
+             class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none" />
+      <p class="text-[10px] text-slate-400 mt-1">Standard adult whole blood unit is 450 mL (±10%).</p>
     </div>
 
-    <button type="submit" [disabled]="loading()"
-            class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition">
-      {{ loading() ? 'Recording...' : 'Record Donation' }}
+    <button type="submit" [disabled]="loading() || !foundDonor()"
+            class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-red-200">
+      {{ loading() ? 'Recording Collection...' : 'Confirm & Record Donation' }}
     </button>
   </form>
 </div>

@@ -6,6 +6,10 @@ export interface AdminUserSummary {
   accountStatus: string;
   isActive: boolean;
   isMfaEnabled: boolean;
+  verificationDocumentUrl?: string;
+  verificationDocumentName?: string;
+  verificationDocumentType?: string;
+  createdAtUtc?: string;
 }
 
 export interface DashboardStats {
@@ -13,6 +17,7 @@ export interface DashboardStats {
   totalHospitals: number;
   openRequests: number;
   criticalRequests: number;
+  pendingApprovals?: number;
 }
 
 export interface AuditLog {
@@ -22,4 +27,23 @@ export interface AuditLog {
   details: string | null;
   ipAddress: string | null;
   createdAtUtc: string;
+}
+
+export interface PendingUserApproval {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber?: string;
+  nicNumber: string;
+  district: string;
+  dateOfBirth: string;
+  role: string;
+  accountStatus: string;
+  createdAtUtc: string;
+  verificationDocumentUrl?: string;
+  verificationDocumentName?: string;
+  verificationDocumentType?: string;
+  facilityName?: string;
+  bloodType?: string;
+  weightKg?: number;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { AdminUserSummary, AuditLog, DashboardStats } from '../models/admin.models';
+import { AdminUserSummary, AuditLog, DashboardStats, PendingUserApproval } from '../models/admin.models';
 import { Hospital } from '../models/hospital.models';
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +16,18 @@ export class AdminService {
 
   getUsers(page = 1, pageSize = 20) {
     return this.http.get<AdminUserSummary[]>(`${this.base}/users?page=${page}&pageSize=${pageSize}`);
+  }
+
+  getPendingApprovals() {
+    return this.http.get<PendingUserApproval[]>(`${this.base}/pending-approvals`);
+  }
+
+  approveUser(userId: string) {
+    return this.http.post<{ message: string }>(`${this.base}/users/${userId}/approve`, {});
+  }
+
+  rejectUser(userId: string, reason?: string) {
+    return this.http.post<{ message: string }>(`${this.base}/users/${userId}/reject`, { reason });
   }
 
   toggleActive(userId: string) {

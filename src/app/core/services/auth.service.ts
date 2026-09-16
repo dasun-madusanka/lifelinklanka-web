@@ -6,18 +6,17 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   RegisterDto, LoginDto, LoginResultDto, MfaSetupResponseDto,
-  MfaVerifyDto, TokenResponseDto, DecodedToken
+  MfaVerifyDto, TokenResponseDto, DecodedToken, UserProfile, DemoAccount
 } from '../models/auth.models';
 import { TokenStorageService } from './token-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Declare the signal WITHOUT calling decodeStoredToken() here —
-  // property initializers run before the constructor body, so
-  // this.tokenStorage would still be undefined at this point.
   private readonly _currentUser = signal<DecodedToken | null>(null);
+  private readonly _userProfile = signal<UserProfile | null>(null);
 
   readonly currentUser = computed(() => this._currentUser());
+  readonly userProfile = computed(() => this._userProfile());
   readonly isLoggedIn = computed(() => this._currentUser() !== null);
   readonly roles = computed(() => {
     const user = this._currentUser();
@@ -30,8 +29,11 @@ export class AuthService {
     private tokenStorage: TokenStorageService,
     private router: Router
   ) {
-    // Now tokenStorage is guaranteed to be assigned — safe to call here.
-    this._currentUser.set(this.decodeStoredToken());
+    const decoded = this.decodeStoredToken();
+    this._currentUser.set(decoded);
+    if (decoded) {
+      this.loadCurrentUserProfile().subscribe({ error: () => {} });
+    }
   }
 
   private decodeStoredToken(): DecodedToken | null {
@@ -44,6 +46,15 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  uploadVerificationDoc(file: File, documentType: string): Observable<{ documentUrl: string; fileName: string; sizeBytes: number; documentType: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+    return this.http.post<{ documentUrl: string; fileName: string; sizeBytes: number; documentType: string }>(
+      `${environment.apiUrl}/auth/upload-verification-doc`, formData
+    );
   }
 
   register(dto: RegisterDto): Observable<{ message: string }> {
@@ -59,6 +70,7 @@ export class AuthService {
       })
     );
   }
+
 
   verifyMfa(dto: MfaVerifyDto): Observable<TokenResponseDto> {
     return this.http.post<TokenResponseDto>(`${environment.apiUrl}/auth/mfa/verify`, dto).pipe(
@@ -86,6 +98,13 @@ export class AuthService {
     );
   }
 
+  loadCurrentUserProfile(): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${environment.apiUrl}/auth/me`).pipe(
+      tap(profile => this._userProfile.set(profile))
+    );
+  }
+
+
   logout(): void {
     this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({
       complete: () => this.finalizeLogout(),
@@ -96,12 +115,14 @@ export class AuthService {
   private finalizeLogout(): void {
     this.tokenStorage.clear();
     this._currentUser.set(null);
+    this._userProfile.set(null);
     this.router.navigate(['/login']);
   }
 
   private handleTokens(tokens: TokenResponseDto): void {
     this.tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
     this._currentUser.set(jwtDecode<DecodedToken>(tokens.accessToken));
+    this.loadCurrentUserProfile().subscribe({ error: () => {} });
   }
 
   hasRole(role: string): boolean {

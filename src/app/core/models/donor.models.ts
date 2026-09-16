@@ -16,7 +16,16 @@ export function formatBloodType(bt: BloodType): string {
     ABPositive: 'AB+', ABNegative: 'AB-',
     OPositive: 'O+', ONegative: 'O-'
   };
-  return map[bt];
+  return map[bt] ?? bt;
+}
+
+export type DonorTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum Life-Saver';
+
+export function getDonorTier(donationCount: number): DonorTier {
+  if (donationCount >= 25) return 'Platinum Life-Saver';
+  if (donationCount >= 10) return 'Gold';
+  if (donationCount >= 5) return 'Silver';
+  return 'Bronze';
 }
 
 export interface UpsertDonorProfileDto {
@@ -41,8 +50,13 @@ export interface DonorProfile {
   isEligibleToDonate: boolean;
   medicalNotes: string | null;
   consentToBeContacted: boolean;
+  donationsCompletedCount: number;
+  totalVolumeMl: number;
+  donorCardNumber: string | null;
   donationHistory: DonationRecord[];
 }
+
+import type { BloodRequestSummary } from './blood-request.models';
 
 export interface DonorMatch {
   id: string;
@@ -54,6 +68,3 @@ export interface DonorMatch {
   respondedAtUtc: string | null;
   bloodRequest: BloodRequestSummary;
 }
-
-// Minimal shape needed for the match list view
-import type { BloodRequestSummary } from './blood-request.models';

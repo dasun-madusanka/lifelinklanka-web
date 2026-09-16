@@ -1,0 +1,290 @@
+<div class="space-y-8">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+          Executive Compliance & Verification Desk
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Pending Registrations & Credential Approvals</h1>
+      <p class="text-xs sm:text-sm text-slate-500">Review uploaded medical certificates, hospital accreditations, and blood bank licenses before granting system access.</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button (click)="loadPending()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs border border-slate-200 shadow-sm transition flex items-center gap-1.5">
+        <span>🔄 Refresh Queue</span>
+      </button>
+      <a routerLink="/admin/dashboard" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow transition">
+        ← Back to Console
+      </a>
+    </div>
+  </div>
+
+  <!-- Action Alerts -->
+  @if (actionMessage()) {
+    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-2xl p-4 flex items-center justify-between shadow-sm animate-in fade-in">
+      <div class="flex items-center gap-2">
+        <span class="text-base">✅</span>
+        <span class="font-bold">{{ actionMessage() }}</span>
+      </div>
+      <button (click)="actionMessage.set(null)" class="text-emerald-700 font-bold hover:text-emerald-900 text-xs">✕</button>
+    </div>
+  }
+
+  @if (actionError()) {
+    <div class="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-2xl p-4 flex items-center justify-between shadow-sm animate-in fade-in">
+      <div class="flex items-center gap-2">
+        <span class="text-base">⚠️</span>
+        <span class="font-bold">{{ actionError() }}</span>
+      </div>
+      <button (click)="actionError.set(null)" class="text-rose-700 font-bold hover:text-rose-900 text-xs">✕</button>
+    </div>
+  }
+
+  <!-- Queue Summary Metric Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+        <span>Total Pending</span>
+        <span class="text-base">📋</span>
+      </div>
+      <p class="text-3xl font-black text-amber-600">{{ pendingList().length }}</p>
+      <p class="text-[11px] text-slate-500 mt-1">Awaiting admin review</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+        <span>Voluntary Donors</span>
+        <span class="text-base">❤️</span>
+      </div>
+      <p class="text-3xl font-black text-red-600">{{ donorCount }}</p>
+      <p class="text-[11px] text-slate-500 mt-1">Medical certs submitted</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+        <span>Hospital Staff</span>
+        <span class="text-base">🏥</span>
+      </div>
+      <p class="text-3xl font-black text-blue-600">{{ hospitalCount }}</p>
+      <p class="text-[11px] text-slate-500 mt-1">Clinical appointment proof</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+        <span>Regional Blood Banks</span>
+        <span class="text-base">🩸</span>
+      </div>
+      <p class="text-3xl font-black text-rose-600">{{ bloodBankCount }}</p>
+      <p class="text-[11px] text-slate-500 mt-1">Facility licensing submitted</p>
+    </div>
+  </div>
+
+  <!-- Filter Selector Tabs -->
+  <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+    <button (click)="selectedFilter.set('ALL')"
+            [ngClass]="selectedFilter() === 'ALL' ? 'bg-slate-900 text-white font-bold shadow' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'"
+            class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+      <span>All Applications</span>
+      <span class="bg-slate-700/50 text-white px-2 py-0.5 rounded-full text-[10px]">{{ pendingList().length }}</span>
+    </button>
+
+    <button (click)="selectedFilter.set('Donor')"
+            [ngClass]="selectedFilter() === 'Donor' ? 'bg-red-600 text-white font-bold shadow' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'"
+            class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+      <span>Donors</span>
+      <span class="bg-red-700/50 text-white px-2 py-0.5 rounded-full text-[10px]">{{ donorCount }}</span>
+    </button>
+
+    <button (click)="selectedFilter.set('HospitalStaff')"
+            [ngClass]="selectedFilter() === 'HospitalStaff' ? 'bg-blue-600 text-white font-bold shadow' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'"
+            class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+      <span>Hospital Staff</span>
+      <span class="bg-blue-700/50 text-white px-2 py-0.5 rounded-full text-[10px]">{{ hospitalCount }}</span>
+    </button>
+
+    <button (click)="selectedFilter.set('BloodBank')"
+            [ngClass]="selectedFilter() === 'BloodBank' ? 'bg-rose-600 text-white font-bold shadow' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'"
+            class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+      <span>Blood Banks</span>
+      <span class="bg-rose-700/50 text-white px-2 py-0.5 rounded-full text-[10px]">{{ bloodBankCount }}</span>
+    </button>
+  </div>
+
+  <!-- Applications List -->
+  @if (loading()) {
+    <div class="bg-white rounded-3xl p-16 text-center text-sm text-slate-400 border border-slate-200">
+      <span class="inline-block w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin mb-3"></span>
+      <p>Loading compliance verification queue...</p>
+    </div>
+  } @else if (filteredList.length === 0) {
+    <div class="bg-white rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
+      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-3">✓</div>
+      <h3 class="text-base font-black text-slate-900">Verification Queue is Clear</h3>
+      <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">There are no pending registrations waiting for review in this category.</p>
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @for (app of filteredList; track app.id) {
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
+            <!-- Applicant Bio & Details -->
+            <div class="space-y-3 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Role Badge -->
+                @if (app.role === 'Donor') {
+                  <span class="text-xs font-black bg-red-100 text-red-700 px-3 py-1 rounded-full border border-red-200">
+                    Voluntary Blood Donor
+                  </span>
+                } @else if (app.role === 'HospitalStaff') {
+                  <span class="text-xs font-black bg-blue-100 text-blue-700 px-3 py-1 rounded-full border border-blue-200">
+                    Hospital Clinical Staff
+                  </span>
+                } @else {
+                  <span class="text-xs font-black bg-rose-100 text-rose-700 px-3 py-1 rounded-full border border-rose-200">
+                    Regional Blood Bank
+                  </span>
+                }
+
+                <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                  📍 {{ app.district }} District
+                </span>
+
+                <span class="text-[11px] text-slate-400">
+                  Applied: {{ app.createdAtUtc | date:'medium' }}
+                </span>
+              </div>
+
+              <div>
+                <h3 class="text-lg font-black text-slate-900">{{ app.fullName }}</h3>
+                <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 mt-1">
+                  <span>✉️ {{ app.email }}</span>
+                  <span>📞 {{ app.phoneNumber || 'Not provided' }}</span>
+                  <span>🪪 NIC: <strong class="font-mono text-slate-800">{{ app.nicNumber }}</strong></span>
+                  <span>🎂 DOB: {{ app.dateOfBirth | date:'yyyy-MM-dd' }}</span>
+                </div>
+              </div>
+
+              <!-- Role Context & Provisioned Entities -->
+              <div class="text-xs bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                @if (app.role === 'Donor') {
+                  <p class="text-slate-700">
+                    Blood Group: <strong class="text-red-700">{{ app.bloodType || 'OPositive' }}</strong> · 
+                    Body Weight: <strong>{{ app.weightKg || 60 }} kg</strong>
+                  </p>
+                } @else if (app.role === 'HospitalStaff') {
+                  <p class="text-slate-700">
+                    Hospital Affiliation: <strong class="text-blue-800">{{ app.facilityName || 'Hospital Center' }}</strong> ({{ app.district }})
+                  </p>
+                } @else if (app.role === 'BloodBank') {
+                  <p class="text-slate-700">
+                    Blood Transfusion Facility: <strong class="text-rose-800">{{ app.facilityName || 'Regional Center' }}</strong> ({{ app.district }})
+                  </p>
+                }
+              </div>
+
+              <!-- Uploaded Document Review Pill -->
+              @if (app.verificationDocumentUrl) {
+                <div class="flex items-center gap-3">
+                  <button (click)="openDocPreview(app.verificationDocumentUrl, app.verificationDocumentName, app.verificationDocumentType)"
+                          class="inline-flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-4 py-2 rounded-xl border border-indigo-200 transition">
+                    <span>📄 Review Verification Document:</span>
+                    <span class="underline">{{ app.verificationDocumentName || 'View Document' }}</span>
+                    <span>👁️</span>
+                  </button>
+                </div>
+              } @else {
+                <div class="text-xs text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl inline-block border border-amber-200">
+                  ⚠️ No electronic document file attached. Direct verification recommended.
+                </div>
+              }
+            </div>
+
+            <!-- Decision Controls -->
+            <div class="flex flex-row lg:flex-col gap-2.5 self-start lg:self-center min-w-[180px]">
+              <button (click)="approve(app)"
+                      class="flex-1 lg:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md shadow-emerald-200 flex items-center justify-center gap-1.5">
+                <span>✓</span>
+                <span>Approve & Grant Access</span>
+              </button>
+
+              <button (click)="openRejectModal(app)"
+                      class="flex-1 lg:flex-none bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 font-bold py-2.5 px-5 rounded-xl text-xs border border-slate-200 hover:border-rose-300 transition flex items-center justify-center gap-1.5">
+                <span>✕</span>
+                <span>Reject Application</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- DOCUMENT PREVIEW MODAL -->
+@if (previewDoc()) {
+  <div class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full p-6 border border-slate-200 max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-black text-slate-900">Credential Document Preview</h3>
+          <p class="text-xs text-slate-500">{{ previewDoc()?.name }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a [href]="previewDoc()?.url" target="_blank" rel="noopener noreferrer"
+             class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+            Open in New Tab ↗
+          </a>
+          <button (click)="closeDocPreview()" class="text-slate-400 hover:text-slate-700 text-xl px-2">✕</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-auto py-4 min-h-[400px] flex items-center justify-center bg-slate-100 rounded-2xl my-3">
+        @if (isPdf(previewDoc()?.url)) {
+          <iframe [src]="previewDoc()?.url" class="w-full h-[550px] rounded-xl border border-slate-200"></iframe>
+        } @else {
+          <img [src]="previewDoc()?.url" [alt]="previewDoc()?.name" class="max-h-[550px] max-w-full rounded-xl object-contain shadow" />
+        }
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button (click)="closeDocPreview()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2 rounded-xl text-xs transition">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- REJECTION REASON MODAL -->
+@if (rejectingUser()) {
+  <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+      <h3 class="text-base font-black text-slate-900 mb-1">Reject Registration Application</h3>
+      <p class="text-xs text-slate-500 mb-4">
+        Applicant: <strong>{{ rejectingUser()?.fullName }}</strong> ({{ rejectingUser()?.email }})
+      </p>
+
+      <div class="space-y-3 mb-5 text-xs">
+        <label class="block font-bold text-slate-700">Specify Reason for Rejection</label>
+        <textarea [(ngModel)]="rejectionReason" rows="3"
+                  class="w-full border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                  placeholder="e.g. Uploaded medical certificate is illegible or expired. Please re-apply with clear documentation."></textarea>
+      </div>
+
+      <div class="flex gap-3">
+        <button (click)="closeRejectModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
+          Cancel
+        </button>
+        <button (click)="confirmReject()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md shadow-rose-200">
+          Confirm Rejection
+        </button>
+      </div>
+    </div>
+  </div>
+}

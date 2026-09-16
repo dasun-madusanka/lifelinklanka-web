@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BloodRequestSummary, CreateBloodRequestDto } from '../models/blood-request.models';
+import { BloodRequestSummary, CreateBloodRequestDto, UpdateBloodRequestDto } from '../models/blood-request.models';
 
 @Injectable({ providedIn: 'root' })
 export class BloodRequestService {
@@ -9,21 +10,36 @@ export class BloodRequestService {
 
   constructor(private http: HttpClient) {}
 
-  create(dto: CreateBloodRequestDto) {
+  create(dto: CreateBloodRequestDto): Observable<BloodRequestSummary> {
     return this.http.post<BloodRequestSummary>(this.base, dto);
   }
 
-  getOpen(district?: string) {
-    let url = this.base;
-    if (district) url += `?district=${encodeURIComponent(district)}`;
-    return this.http.get<BloodRequestSummary[]>(url);
+  getOpen(district?: string, urgency?: string, bloodType?: string): Observable<BloodRequestSummary[]> {
+    let params = new HttpParams();
+    if (district) params = params.set('district', district);
+    if (urgency) params = params.set('urgency', urgency);
+    if (bloodType) params = params.set('bloodType', bloodType);
+
+    return this.http.get<BloodRequestSummary[]>(this.base, { params });
   }
 
-  getById(id: string) {
+  getOpenRequests(district?: string, urgency?: string, bloodType?: string): Observable<BloodRequestSummary[]> {
+    return this.getOpen(district, urgency, bloodType);
+  }
+
+  getById(id: string): Observable<BloodRequestSummary> {
     return this.http.get<BloodRequestSummary>(`${this.base}/${id}`);
   }
 
-  respond(id: string, accept: boolean) {
+  update(id: string, dto: UpdateBloodRequestDto): Observable<BloodRequestSummary> {
+    return this.http.put<BloodRequestSummary>(`${this.base}/${id}`, dto);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
+  respond(id: string, accept: boolean): Observable<any> {
     return this.http.post(`${this.base}/${id}/respond`, accept, {
       headers: { 'Content-Type': 'application/json' }
     });

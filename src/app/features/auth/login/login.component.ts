@@ -1,13 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignalrService } from '../../../core/services/signalr.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
@@ -16,7 +17,11 @@ export class LoginComponent {
   errorMessage = signal<string | null>(null);
   loading = signal(false);
 
-  constructor(private auth: AuthService, private signalr: SignalrService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private signalr: SignalrService,
+    private router: Router
+  ) {}
 
   onSubmit(): void {
     this.errorMessage.set(null);
@@ -26,8 +31,6 @@ export class LoginComponent {
       next: (result) => {
         this.loading.set(false);
         if (result.requiresMfa) {
-          // Stash the challenge token briefly in-memory via router state so the
-          // MFA-verify screen (a separate route) can read it.
           this.router.navigate(['/mfa-setup'], {
             state: { mfaChallengeToken: result.mfaChallengeToken, verifyMode: true }
           });
@@ -38,7 +41,8 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(err.error?.title ?? 'Invalid email or password.');
+        const msg = err.error?.message ?? err.error?.title ?? (typeof err.error === 'string' ? err.error : 'Invalid email or password.');
+        this.errorMessage.set(msg);
       }
     });
   }

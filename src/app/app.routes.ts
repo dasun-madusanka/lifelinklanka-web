@@ -3,7 +3,10 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: '',
+    loadComponent: () => import('./features/home/landing-page/landing-page.component').then(m => m.LandingPageComponent)
+  },
 
   {
     path: 'login',
@@ -26,20 +29,45 @@ export const routes: Routes = [
   },
 
   {
+    path: 'inventory',
+    loadComponent: () => import('./features/inventory/inventory-dashboard.component').then(m => m.InventoryDashboardComponent)
+  },
+
+  {
+    path: 'camps',
+    loadComponent: () => import('./features/camps/camps-list.component').then(m => m.CampsListComponent)
+  },
+
+  {
+    path: 'map',
+    loadComponent: () => import('./features/map/sri-lanka-map.component').then(m => m.SriLankaMapComponent)
+  },
+
+  {
+    path: 'appointments',
+    loadComponent: () => import('./features/appointments/appointments.component').then(m => m.AppointmentsComponent),
+    canActivate: [authGuard]
+  },
+
+  {
+    path: 'donor/card',
+    loadComponent: () => import('./features/donor/donor-card/donor-card.component').then(m => m.DonorCardComponent),
+    canActivate: [roleGuard(['Donor', 'Admin'])]
+  },
+  {
     path: 'donor/profile',
     loadComponent: () => import('./features/donor/donor-profile/donor-profile.component').then(m => m.DonorProfileComponent),
-    canActivate: [roleGuard(['Donor'])]
+    canActivate: [roleGuard(['Donor', 'Admin'])]
   },
   {
     path: 'donor/matches',
     loadComponent: () => import('./features/donor/my-matches/my-matches.component').then(m => m.MyMatchesComponent),
-    canActivate: [roleGuard(['Donor'])]
+    canActivate: [roleGuard(['Donor', 'Admin'])]
   },
 
   {
     path: 'blood-requests',
-    loadComponent: () => import('./features/blood-requests/request-list/request-list.component').then(m => m.RequestListComponent),
-    canActivate: [authGuard]
+    loadComponent: () => import('./features/blood-requests/request-list/request-list.component').then(m => m.RequestListComponent)
   },
   {
     path: 'blood-requests/create',
@@ -48,8 +76,7 @@ export const routes: Routes = [
   },
   {
     path: 'blood-requests/:id',
-    loadComponent: () => import('./features/blood-requests/request-detail/request-detail.component').then(m => m.RequestDetailComponent),
-    canActivate: [authGuard]
+    loadComponent: () => import('./features/blood-requests/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
   },
 
   {
@@ -80,6 +107,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
       },
       {
+        path: 'approvals',
+        loadComponent: () => import('./features/admin/admin-approvals/admin-approvals.component').then(m => m.AdminApprovalsComponent)
+      },
+      {
         path: 'users',
         loadComponent: () => import('./features/admin/admin-users/admin-users.component').then(m => m.AdminUsersComponent)
       },
@@ -94,5 +125,5 @@ export const routes: Routes = [
     ]
   },
 
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: '' }
 ];

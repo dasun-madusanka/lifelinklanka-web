@@ -6,6 +6,21 @@ export interface RegisterDto {
   district: string;
   dateOfBirth: string; // ISO date string
   role: string;
+  phoneNumber?: string;
+  bloodType?: string;
+  weightKg?: number;
+  hospitalName?: string;
+  hospitalRegistrationNumber?: string;
+  hospitalDistrict?: string;
+  hospitalAddress?: string;
+  hospitalContactPhone?: string;
+  bloodBankName?: string;
+  bloodBankDistrict?: string;
+  bloodBankAddress?: string;
+  bloodBankContactPhone?: string;
+  verificationDocumentUrl?: string;
+  verificationDocumentName?: string;
+  verificationDocumentType?: string;
 }
 
 export interface LoginDto {
@@ -42,4 +57,51 @@ export interface DecodedToken {
   mfaEnabled: string;
   role: string | string[];
   exp: number;
+}
+
+export interface AffiliatedFacility {
+  type: 'Hospital' | 'BloodBank';
+  id: string;
+  name: string;
+  district: string;
+  address?: string;
+  contactPhone: string;
+  registrationNumber?: string;
+}
+
+export interface UserDonorProfile {
+  bloodType: string;
+  weightKg: number;
+  isEligibleToDonate: boolean;
+  lastDonationDateUtc?: string;
+  donationsCompletedCount: number;
+  totalVolumeDonatedMl: number;
+  donorCardNumber: string;
+  consentToBeContacted: boolean;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  district: string;
+  nicNumber: string;
+  dateOfBirth: string;
+  phoneNumber?: string;
+  isMfaEnabled: boolean;
+  accountStatus: string;
+  roles: string[];
+  affiliatedFacility?: AffiliatedFacility;
+  donorProfile?: UserDonorProfile;
+}
+
+export interface DemoAccount {
+  role: string;
+  email: string;
+  fullName: string;
+  title: string;
+  district: string;
+  nic: string;
+  badge: string;
+  description: string;
 }

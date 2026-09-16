@@ -1,37 +1,98 @@
-<nav class="bg-red-700 text-white shadow-md">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-    <a routerLink="/dashboard" class="text-xl font-bold flex items-center gap-2">
-      🩸 LifeLink Lanka
-    </a>
-
-    @if (auth.isLoggedIn()) {
-      <div class="flex items-center gap-4 text-sm">
-        <a routerLink="/dashboard" routerLinkActive="underline" class="hover:text-red-200">Dashboard</a>
-        <a routerLink="/blood-requests" routerLinkActive="underline" class="hover:text-red-200">Blood Requests</a>
-
-        @if (auth.hasRole('Donor')) {
-          <a routerLink="/donor/profile" routerLinkActive="underline" class="hover:text-red-200">My Profile</a>
-          <a routerLink="/donor/matches" routerLinkActive="underline" class="hover:text-red-200">My Matches</a>
-        }
-
-        @if (auth.hasRole('HospitalStaff')) {
-          <a routerLink="/blood-requests/create" routerLinkActive="underline" class="hover:text-red-200">New Request</a>
-        }
-
-        @if (auth.hasRole('Admin')) {
-          <a routerLink="/admin/dashboard" routerLinkActive="underline" class="hover:text-red-200">Admin</a>
-        }
-
-        <span class="text-red-200">{{ auth.currentUser()?.fullName }}</span>
-        <button (click)="logout()" class="bg-red-800 hover:bg-red-900 px-3 py-1.5 rounded text-white">
-          Logout
-        </button>
-      </div>
-    } @else {
-      <div class="flex gap-3">
-        <a routerLink="/login" class="hover:text-red-200">Login</a>
-        <a routerLink="/register" class="bg-white text-red-700 px-3 py-1.5 rounded font-medium">Register</a>
-      </div>
-    }
+﻿<!-- Top System Connectivity Ribbon -->
+<div class="bg-slate-950 text-slate-400 text-xs px-4 py-1.5 border-b border-slate-800">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-2 text-slate-300 font-semibold tracking-wide text-[11px]">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>National Blood Transfusion & Clinical Emergency Grid · 24/7 Operations</span>
+    </div>
+    <div class="flex items-center gap-3 text-xs">
+      <span class="text-slate-500 hidden sm:inline">Precision Healthcare Network</span>
+      <a routerLink="/login" class="text-emerald-400 hover:text-emerald-300 font-bold transition">Authorized Sign In →</a>
+    </div>
   </div>
-</nav>
+</div>
+
+<!-- Main Public Navigation Bar -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Brand Logo -->
+      <a routerLink="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-700 via-rose-600 to-red-500 flex items-center justify-center text-white shadow-md shadow-red-200 group-hover:scale-105 transition">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xl font-black tracking-tight text-slate-900">LifeLink<span class="text-red-600">Lanka</span></span>
+          <p class="text-[10px] text-slate-500 font-medium tracking-tight hidden sm:block">National Transfusion Management Grid</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links (Clean & Spacious) -->
+      <nav class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-600">
+        <a routerLink="/" routerLinkActive="text-red-600 bg-red-50 font-bold" [routerLinkActiveOptions]="{exact: true}"
+           class="px-3.5 py-2 rounded-xl hover:text-red-600 hover:bg-slate-50 transition">
+          Home
+        </a>
+        <a routerLink="/blood-requests" routerLinkActive="text-red-600 bg-red-50 font-bold"
+           class="px-3.5 py-2 rounded-xl hover:text-red-600 hover:bg-slate-50 transition flex items-center gap-1.5">
+          <span>Urgent Requests</span>
+          <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+        </a>
+        <a routerLink="/camps" routerLinkActive="text-red-600 bg-red-50 font-bold"
+           class="px-3.5 py-2 rounded-xl hover:text-red-600 hover:bg-slate-50 transition">
+          Mobile Camps
+        </a>
+        <a routerLink="/inventory" routerLinkActive="text-red-600 bg-red-50 font-bold"
+           class="px-3.5 py-2 rounded-xl hover:text-red-600 hover:bg-slate-50 transition">
+          Cold Chain Stock
+        </a>
+        <a routerLink="/map" routerLinkActive="text-red-600 bg-red-50 font-bold"
+           class="px-3.5 py-2 rounded-xl hover:text-red-600 hover:bg-slate-50 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          <span>Island Map</span>
+        </a>
+      </nav>
+
+      <!-- Right Action CTAs -->
+      <div class="hidden sm:flex items-center gap-2.5">
+        <a routerLink="/login"
+           class="text-xs font-bold text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl hover:bg-slate-100 border border-slate-200 transition">
+          Sign In
+        </a>
+        <a routerLink="/register"
+           class="text-xs font-bold bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl shadow-md shadow-red-200 transition flex items-center gap-1.5">
+          <span>Register Now</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      <!-- Mobile Menu Toggle Button -->
+      <button (click)="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Mobile Drawer -->
+  @if (showMobileMenu()) {
+    <div class="md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-2 text-sm font-semibold">
+      <a routerLink="/" (click)="showMobileMenu.set(false)" class="block px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50">Home</a>
+      <a routerLink="/blood-requests" (click)="showMobileMenu.set(false)" class="block px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50">Urgent Requests</a>
+      <a routerLink="/camps" (click)="showMobileMenu.set(false)" class="block px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50">Mobile Camps</a>
+      <a routerLink="/inventory" (click)="showMobileMenu.set(false)" class="block px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50">Cold Chain Stock</a>
+      <a routerLink="/map" (click)="showMobileMenu.set(false)" class="block px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50">Island Map</a>
+      <div class="pt-2 border-t border-slate-100 flex gap-2">
+        <a routerLink="/login" (click)="showMobileMenu.set(false)" class="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold">Sign In</a>
+        <a routerLink="/register" (click)="showMobileMenu.set(false)" class="flex-1 text-center py-2 rounded-xl bg-red-600 text-white text-xs font-bold shadow">Register</a>
+      </div>
+    </div>
+  }
+</header>
