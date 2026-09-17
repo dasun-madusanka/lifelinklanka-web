@@ -1,53 +1,76 @@
-<div>
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Manage Users</h1>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full">
+          Governance & Identity
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Manage Users & Roles</h1>
+      <p class="text-xs sm:text-sm text-slate-500">Configure administrative access, grant specialized clinical roles, and manage active account statuses.</p>
+    </div>
+    <span class="self-start sm:self-auto bg-white border border-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs">
+      {{ users().length }} Registered Users
+    </span>
+  </div>
 
-  <div class="bg-white rounded-xl shadow overflow-hidden">
-    <table class="w-full text-sm">
-      <thead class="bg-gray-50 text-gray-500 text-left">
-        <tr>
-          <th class="px-4 py-3">Name</th>
-          <th class="px-4 py-3">Email</th>
-          <th class="px-4 py-3">District</th>
-          <th class="px-4 py-3">MFA</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3">Assign Role</th>
-          <th class="px-4 py-3"></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (u of users(); track u.id) {
-          <tr class="border-t">
-            <td class="px-4 py-3">{{ u.fullName }}</td>
-            <td class="px-4 py-3">{{ u.email }}</td>
-            <td class="px-4 py-3">{{ u.district }}</td>
-            <td class="px-4 py-3">{{ u.isMfaEnabled ? '✅' : '—' }}</td>
-            <td class="px-4 py-3">
-              @if (u.isActive) {
-                <span class="text-green-600 font-medium">Active</span>
-              } @else {
-                <span class="text-red-600 font-medium">Suspended</span>
-              }
-            </td>
-            <td class="px-4 py-3">
-              <div class="flex gap-2">
-                <select [(ngModel)]="selectedRole[u.id]" class="border border-gray-300 rounded px-2 py-1 text-xs">
-                  <option value="" disabled selected>Select role</option>
-                  @for (r of roles; track r) {
-                    <option [value]="r">{{ r }}</option>
-                  }
-                </select>
-                <button (click)="assignRole(u.id)" class="text-xs bg-gray-800 text-white px-2 py-1 rounded">Set</button>
-              </div>
-            </td>
-            <td class="px-4 py-3">
-              <button (click)="toggleActive(u.id)" class="text-xs px-3 py-1.5 rounded"
-                      [ngClass]="u.isActive ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
-                {{ u.isActive ? 'Suspend' : 'Activate' }}
-              </button>
-            </td>
+  <!-- Users Table Card with Responsive Scroll -->
+  <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+          <tr>
+            <th class="px-4 py-3.5 whitespace-nowrap">Name</th>
+            <th class="px-4 py-3.5 whitespace-nowrap">Email</th>
+            <th class="px-4 py-3.5 whitespace-nowrap">District</th>
+            <th class="px-4 py-3.5 whitespace-nowrap text-center">MFA</th>
+            <th class="px-4 py-3.5 whitespace-nowrap">Status</th>
+            <th class="px-4 py-3.5 whitespace-nowrap">Assign Role</th>
+            <th class="px-4 py-3.5 whitespace-nowrap text-right">Action</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (u of users(); track u.id) {
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="px-4 py-3.5 font-bold text-slate-900 whitespace-nowrap">{{ u.fullName }}</td>
+              <td class="px-4 py-3.5 text-slate-600 whitespace-nowrap">{{ u.email }}</td>
+              <td class="px-4 py-3.5 text-slate-500 whitespace-nowrap">{{ u.district }}</td>
+              <td class="px-4 py-3.5 text-center whitespace-nowrap">{{ u.isMfaEnabled ? '✅' : '—' }}</td>
+              <td class="px-4 py-3.5 whitespace-nowrap">
+                @if (u.isActive) {
+                  <span class="inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Active
+                  </span>
+                } @else {
+                  <span class="inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                    Suspended
+                  </span>
+                }
+              </td>
+              <td class="px-4 py-3.5 whitespace-nowrap">
+                <div class="flex items-center gap-1.5">
+                  <select [(ngModel)]="selectedRole[u.id]" class="border border-slate-200 bg-slate-50 rounded-lg px-2 py-1 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none">
+                    <option value="" disabled selected>Select role</option>
+                    @for (r of roles; track r) {
+                      <option [value]="r">{{ r }}</option>
+                    }
+                  </select>
+                  <button (click)="assignRole(u.id)" class="text-xs bg-slate-900 hover:bg-red-600 text-white font-bold px-2.5 py-1 rounded-lg transition shadow-xs">
+                    Set
+                  </button>
+                </div>
+              </td>
+              <td class="px-4 py-3.5 text-right whitespace-nowrap">
+                <button (click)="toggleActive(u.id)" class="text-xs font-bold px-3 py-1.5 rounded-lg transition"
+                        [ngClass]="u.isActive ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'">
+                  {{ u.isActive ? 'Suspend' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

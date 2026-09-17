@@ -1,26 +1,52 @@
-<div>
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Audit Logs</h1>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
+          Security & Compliance
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">System Audit Trail</h1>
+      <p class="text-xs sm:text-sm text-slate-500">Immutable ledger of administrative decisions, identity verifications, and clinical actions.</p>
+    </div>
+    <span class="self-start sm:self-auto bg-white border border-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs">
+      {{ logs().length }} Records Logged
+    </span>
+  </div>
 
-  <div class="bg-white rounded-xl shadow overflow-hidden">
-    <table class="w-full text-sm">
-      <thead class="bg-gray-50 text-gray-500 text-left">
-        <tr>
-          <th class="px-4 py-3">Timestamp</th>
-          <th class="px-4 py-3">Action</th>
-          <th class="px-4 py-3">Details</th>
-          <th class="px-4 py-3">IP Address</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (log of logs(); track log.id) {
-          <tr class="border-t">
-            <td class="px-4 py-3 text-gray-500">{{ log.createdAtUtc | date:'medium' }}</td>
-            <td class="px-4 py-3 font-medium text-gray-800">{{ log.action }}</td>
-            <td class="px-4 py-3 text-gray-500">{{ log.details || '—' }}</td>
-            <td class="px-4 py-3 text-gray-400">{{ log.ipAddress || '—' }}</td>
+  <!-- Audit Table Card -->
+  <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+          <tr>
+            <th class="px-4 py-3.5 whitespace-nowrap">Timestamp</th>
+            <th class="px-4 py-3.5 whitespace-nowrap">Action Event</th>
+            <th class="px-4 py-3.5 whitespace-nowrap">Details</th>
+            <th class="px-4 py-3.5 whitespace-nowrap text-right">IP Address</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (log of logs(); track log.id) {
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="px-4 py-3.5 text-slate-500 whitespace-nowrap font-mono">{{ log.createdAtUtc | date:'medium' }}</td>
+              <td class="px-4 py-3.5 whitespace-nowrap">
+                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md">
+                  {{ log.action }}
+                </span>
+              </td>
+              <td class="px-4 py-3.5 text-slate-600 min-w-[200px]">{{ log.details || '—' }}</td>
+              <td class="px-4 py-3.5 text-slate-400 font-mono text-right whitespace-nowrap">{{ log.ipAddress || '—' }}</td>
+            </tr>
+          }
+          @if (logs().length === 0) {
+            <tr>
+              <td colspan="4" class="px-4 py-8 text-center text-slate-400">No audit logs recorded yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

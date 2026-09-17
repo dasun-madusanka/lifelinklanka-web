@@ -15,7 +15,7 @@
 
     <!-- LEFT: REAL GEOGRAPHIC SRI LANKA LEAFLET MAP (6 cols) -->
     <div class="lg:col-span-6 space-y-4">
-      <div class="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-3xl p-5 sm:p-6 border border-slate-800 shadow-2xl relative overflow-hidden">
+      <div class="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-slate-800 shadow-2xl relative overflow-hidden">
         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#f43f5e_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none"></div>
 
         <div class="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-3 text-white">
@@ -32,7 +32,7 @@
             <div class="inline-flex rounded-xl p-0.5 bg-slate-900/90 border border-slate-700/80 text-[10px] font-bold">
               <button (click)="setBasemap('dark')"
                       [ngClass]="activeTileStyle() === 'dark' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'"
-                      class="px-2.5 py-1 rounded-lg transition">
+                      class="px-2 py-1 rounded-lg transition">
                 Dark Grid (Default)
               </button>
               <button (click)="setBasemap('voyager')"
@@ -64,9 +64,9 @@
           </span>
         </div>
 
-        <!-- Real Leaflet Interactive Map Container -->
+        <!-- Real Leaflet Interactive Map Container (Responsive Height) -->
         <div class="relative z-10 w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
-          <div id="sriLankaLeafletMap" class="w-full h-[540px] bg-slate-950"></div>
+          <div id="sriLankaLeafletMap" class="w-full h-[360px] sm:h-[460px] lg:h-[540px] bg-slate-950"></div>
         </div>
 
         <!-- Map Legend -->

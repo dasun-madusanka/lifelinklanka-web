@@ -1,6 +1,8 @@
-﻿import { Component, OnInit, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { SignalrService } from '../../core/services/signalr.service';
 import { AdminService } from '../../core/services/admin.service';
@@ -11,9 +13,13 @@ import { AdminService } from '../../core/services/admin.service';
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html'
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
+  @Input() mobileOpen = false;
+  @Output() closeMobileDrawer = new EventEmitter<void>();
+
   isCollapsed = signal(false);
   pendingApprovalsCount = signal(0);
+  private routerSub?: Subscription;
 
   constructor(
     public auth: AuthService,
@@ -26,6 +32,20 @@ export class SidebarComponent implements OnInit {
     if (this.auth.hasRole('Admin')) {
       this.refreshPendingCount();
     }
+
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.closeDrawer();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+  }
+
+  closeDrawer(): void {
+    this.closeMobileDrawer.emit();
   }
 
   refreshPendingCount(): void {
