@@ -12,8 +12,8 @@ import { RouterLink } from '@angular/router';
 
           <!-- Col 1: Brand & Mission -->
           <div class="space-y-4">
-            <div class="flex items-center gap-2 text-white font-bold text-lg">
-              <span class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white text-base">🩸</span>
+            <div class="flex items-center gap-3 text-white font-bold text-lg">
+              <img src="/assets/logo.png" alt="LifeLink Lanka Logo" class="w-9 h-9 object-contain drop-shadow" />
               <span>LifeLink Lanka</span>
             </div>
             <p class="text-xs text-slate-400 leading-relaxed">

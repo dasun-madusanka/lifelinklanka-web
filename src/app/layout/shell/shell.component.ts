@@ -39,6 +39,8 @@ import { SignalrService } from '../../core/services/signalr.service';
                 </svg>
               </button>
 
+              <img src="/assets/logo.png" alt="LifeLink Logo" class="w-7 h-7 object-contain md:hidden shrink-0" />
+
               <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 shrink-0">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="hidden sm:inline">Clinical Transfusion Network</span>
