@@ -18,6 +18,7 @@ export class RegisterComponent {
   fullName = '';
   email = '';
   password = '';
+  showPassword = signal(false);
   nicNumber = '';
   district = 'Colombo';
   dateOfBirth = '';
@@ -61,6 +62,10 @@ export class RegisterComponent {
   loading = signal(false);
 
   constructor(private auth: AuthService, private router: Router) {}
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update(v => !v);
+  }
 
   selectRole(role: 'Donor' | 'HospitalStaff' | 'BloodBank'): void {
     this.selectedRole.set(role);

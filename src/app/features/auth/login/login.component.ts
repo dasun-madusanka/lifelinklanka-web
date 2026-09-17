@@ -14,8 +14,13 @@ import { SignalrService } from '../../../core/services/signalr.service';
 export class LoginComponent {
   email = '';
   password = '';
+  showPassword = signal(false);
   errorMessage = signal<string | null>(null);
   loading = signal(false);
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update(v => !v);
+  }
 
   constructor(
     private auth: AuthService,
