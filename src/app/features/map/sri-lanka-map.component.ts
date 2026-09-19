@@ -82,7 +82,7 @@ export class SriLankaMapComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = signal(true);
 
   selectedDistrict = signal<string>('Colombo');
-  activeTileStyle = signal<'dark' | 'voyager' | 'osm'>('dark');
+  activeTileStyle = signal<'dark' | 'satellite' | 'osm'>('dark');
 
   provinces: ProvinceInfo[] = [
     { name: 'Western Province', districts: ['Colombo', 'Gampaha', 'Kalutara'] },
@@ -149,31 +149,38 @@ export class SriLankaMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderFacilityMarkers();
   }
 
-  setBasemap(style: 'dark' | 'voyager' | 'osm'): void {
+  setBasemap(style: 'dark' | 'satellite' | 'osm'): void {
     this.activeTileStyle.set(style);
     this.applyTileLayer(style);
   }
 
-  private applyTileLayer(style: 'dark' | 'voyager' | 'osm'): void {
+  private applyTileLayer(style: 'dark' | 'satellite' | 'osm'): void {
     if (!this.map) return;
 
     if (this.currentTileLayer) {
       this.map.removeLayer(this.currentTileLayer);
     }
 
-    let url = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-    let attribution = '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+    // Default: ESRI High-Contrast Dark Gray Canvas (Watermark-free, keyless, fast)
+    let url = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+    let attribution = 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ';
+    let maxZoom = 16;
 
-    if (style === 'voyager') {
-      url = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    if (style === 'satellite') {
+      // ESRI World Imagery Satellite (Real high-res aerial imagery of Sri Lanka, keyless)
+      url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      attribution = 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics';
+      maxZoom = 18;
     } else if (style === 'osm') {
+      // Standard OpenStreetMap (Global open cartographic data, keyless)
       url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
       attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+      maxZoom = 19;
     }
 
     this.currentTileLayer = L.tileLayer(url, {
       attribution,
-      maxZoom: 19
+      maxZoom
     }).addTo(this.map);
   }
 

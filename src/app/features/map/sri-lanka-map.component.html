@@ -33,17 +33,17 @@
               <button (click)="setBasemap('dark')"
                       [ngClass]="activeTileStyle() === 'dark' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'"
                       class="px-2 py-1 rounded-lg transition">
-                Dark Grid (Default)
+                Dark Canvas
               </button>
-              <button (click)="setBasemap('voyager')"
-                      [ngClass]="activeTileStyle() === 'voyager' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'"
+              <button (click)="setBasemap('satellite')"
+                      [ngClass]="activeTileStyle() === 'satellite' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'"
                       class="px-2 py-1 rounded-lg transition">
-                Voyager
+                Satellite
               </button>
               <button (click)="setBasemap('osm')"
                       [ngClass]="activeTileStyle() === 'osm' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'"
                       class="px-2 py-1 rounded-lg transition">
-                OSM
+                OpenStreetMap
               </button>
             </div>
 
